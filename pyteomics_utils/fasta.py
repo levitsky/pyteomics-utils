@@ -12,7 +12,8 @@ def decoy(args):
 def register_commands(subparsers, parents=[]):
     fasta_parser = subparsers.add_parser('fasta', parents=parents)
     fasta_commands = fasta_parser.add_subparsers()
-    fasta_decoy = fasta_commands.add_parser('decoy', parents=parents)
+    fasta_decoy = fasta_commands.add_parser('decoy', parents=parents,
+        description='Read a FASTA file from standard input, write a FASTA with decoys to standard output.')
     fasta_decoy.set_defaults(func=decoy)
     fasta_decoy.add_argument('-m', '--mode', choices=fasta._decoy_functions.keys(), default='reverse')
     fasta_decoy.add_argument('--keep-nterm', action='store_true', help='Keep N-terminal residue in decoy sequences')

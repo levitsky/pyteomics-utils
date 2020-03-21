@@ -8,7 +8,7 @@ from setuptools import setup, find_packages
 
 setup(
     name                 = 'pyteomics-utils',
-    version              = '0.0.2',
+    version              = '0.0.3',
     description          = '''Simple but handy CLI tools for everyday data analysis tasks.''',
     long_description     = (''.join(open('README.md').readlines())),
     author               = 'Lev Levitsky',

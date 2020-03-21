@@ -1,5 +1,5 @@
 # pyteomics-utils
-Simple but handy CLI tools for everyday data analysis tasks
+Simple but handy CLI tools for everyday data analysis tasks.
 
 The commands operate on stdin and write to stdout whenever possible.
 

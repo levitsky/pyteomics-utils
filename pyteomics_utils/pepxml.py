@@ -27,3 +27,5 @@ def register_commands(subparsers, parents):
     pepxml_filter = pepxml_commands.add_parser('filter', parents=[parents['common']],
         description='Apply FDR threshold and report the number of PSMs in files.')
     pepxml_filter.set_defaults(func=filter)
+    pepxml_filter.add_argument('--fdr', type=float, default=0.01)
+    pepxml_filter.add_argument('-p', '--decoy-prefix', default='DECOY_')

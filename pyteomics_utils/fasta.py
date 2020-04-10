@@ -1,5 +1,4 @@
 import logging
-import sys
 from pyteomics import fasta
 import os
 from . import utils

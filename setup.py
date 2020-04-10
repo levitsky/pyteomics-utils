@@ -14,6 +14,7 @@ setup(
     author               = 'Lev Levitsky',
     author_email         = 'pyteomics@googlegroups.com',
     install_requires     = ['pyteomics'],
+    extras_require       = {'XML': ['lxml', 'numpy']},
     classifiers          = ['Intended Audience :: Science/Research',
                             'Programming Language :: Python :: 2.7',
                             'Programming Language :: Python :: 3',

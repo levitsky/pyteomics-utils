@@ -30,8 +30,8 @@ def describe(args):
             logger.debug('First entry: %s', dlist[0])
             if n > 2:
                 dlist.sort()
-                prefix_1 = os.path.commonprefix(dlist[:n//2])
-                prefix_2 = os.path.commonprefix(dlist[n//2+1:])
+                prefix_1 = os.path.commonprefix(dlist[:n // 2])
+                prefix_2 = os.path.commonprefix(dlist[n // 2 + 1:])
                 if prefix_1 != prefix_2:
                     logger.info('Common prefixes: %s, %s', prefix_1, prefix_2)
                 else:

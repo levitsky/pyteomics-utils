@@ -1,5 +1,6 @@
+from . import utils
 try:
-    from pyteomics import pepxml
+    from pyteomics import pepxml, auxiliary as aux
 except ImportError as e:
     pepxml = None
     exception = e
@@ -8,6 +9,7 @@ else:
 import logging
 
 logger = logging.getLogger(__name__)
+FORMAT = '%-20s\t%+10s\t%+10s'
 
 
 def _check_pepxml():
@@ -15,17 +17,26 @@ def _check_pepxml():
         logger.error('Missing dependencies for pepxml subcommand: %s', exception)
 
 
-def filter(files):
+@utils.multiple_files(lambda x: None)
+def show_info(args):
+    with pepxml.PepXML(args.file) as f:
+        psms = list(f)
+        fpsms = aux.filter(psms, is_decoy=lambda x: pepxml.is_decoy(x, args.decoy_prefix), fdr=args.fdr, key=pepxml._key, )
+        logger.info(FORMAT, args.file, len(psms), fpsms.size)
+
+
+def info(args):
     _check_pepxml()
-    logger.info('This function is not implemented yet.')
+    logger.info(FORMAT, 'File', 'Total PSMs', '{:.0%} FDR'.format(args.fdr))
+    show_info(args)
 
 
 def register_commands(subparsers, parents):
     pepxml_parser = subparsers.add_parser('pepxml', parents=[parents['common']])
     pepxml_commands = pepxml_parser.add_subparsers()
 
-    pepxml_filter = pepxml_commands.add_parser('filter', parents=[parents['common']],
+    pepxml_info = pepxml_commands.add_parser('info', parents=[parents['common'], parents['io']],
         description='Apply FDR threshold and report the number of PSMs in files.')
-    pepxml_filter.set_defaults(func=filter)
-    pepxml_filter.add_argument('--fdr', type=float, default=0.01)
-    pepxml_filter.add_argument('-p', '--decoy-prefix', default='DECOY_')
+    pepxml_info.set_defaults(func=info)
+    pepxml_info.add_argument('-f', '--fdr', type=float, default=0.01, help='FDR level (between 0.0 and 1.0)')
+    pepxml_info.add_argument('-p', '--decoy-prefix', default='DECOY_')

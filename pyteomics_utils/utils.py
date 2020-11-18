@@ -26,4 +26,3 @@ def multiple_files(fname_formatter=default_fname_formater):
                         func(arguments)
         return wrapped
     return wrapper
-

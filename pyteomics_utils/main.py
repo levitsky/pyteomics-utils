@@ -26,8 +26,8 @@ def main():
 
     args = main_parser.parse_args()
 
-    logging.basicConfig(format='{levelname:>8}: {asctime} {message}',
-                        datefmt='[%H:%M:%S]', level=levels[args.verbosity], style='{')
+    logging.basicConfig(format='%(levelname)8s: %(asctime)s %(message)s',
+                        datefmt='[%H:%M:%S]', level=levels[args.verbosity])
     logger = logging.getLogger(__name__)
     logger.debug('Received args in main: %s', args)
     args.func(args)

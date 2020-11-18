@@ -9,7 +9,7 @@ else:
 import logging
 
 logger = logging.getLogger(__name__)
-FORMAT = '%-20s\t%+10s\t%+10s'
+FORMAT = '%-{}s\t%+10s\t%+10s'
 
 
 def _check_pepxml():
@@ -22,12 +22,14 @@ def show_info(args):
     with pepxml.PepXML(args.file) as f:
         psms = list(f)
         fpsms = aux.filter(psms, is_decoy=lambda x: pepxml.is_decoy(x, args.decoy_prefix), fdr=args.fdr, key=pepxml._key, )
-        logger.info(FORMAT, args.file, len(psms), fpsms.size)
+        logger.info(args.format, args.file, len(psms), fpsms.size)
 
 
 def info(args):
     _check_pepxml()
-    logger.info(FORMAT, 'File', 'Total PSMs', '{:.0%} FDR'.format(args.fdr))
+    log_format = FORMAT.format(max(len(x) for x in args.files))
+    logger.info(log_format, 'File', 'Total PSMs', '{:.0%} FDR'.format(args.fdr))
+    args.format = log_format
     show_info(args)
 
 

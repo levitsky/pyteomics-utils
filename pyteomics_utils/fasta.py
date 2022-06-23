@@ -1,4 +1,6 @@
 import logging
+import argparse
+import itertools
 from pyteomics import fasta
 import os
 from . import utils
@@ -53,18 +55,36 @@ def describe(args):
                 logger.info('Possible header formats: %s', ', '.join(formats))
 
 
+def combine(args):
+    kwargs = dict(mode=args.mode, keep_nterm=args.keep_nterm, keep_cterm=args.keep_cterm,
+        prefix=args.prefix)
+    with fasta.chain.from_iterable(args.files) as copy, \
+            fasta.decoy_chain.from_iterable(args.with_decoy, **kwargs) as with_decoy, \
+            fasta.decoy_chain.from_iterable(args.decoy_only, decoy_only=True, **kwargs) as decoy_only:
+        entries = itertools.chain(copy, with_decoy, decoy_only)
+        fasta.write(entries, args.output)
+
+
 def register_commands(subparsers, parents):
     fasta_parser = subparsers.add_parser('fasta')
     fasta_commands = fasta_parser.add_subparsers()
 
-    fasta_decoy = fasta_commands.add_parser('decoy', parents=[parents['common'], parents['io']],
+    common_decoy_parser = argparse.ArgumentParser(add_help=False)
+    common_decoy_parser.add_argument('-m', '--mode', choices=fasta._decoy_functions.keys(), default='reverse')
+    common_decoy_parser.add_argument('--keep-nterm', action='store_true', help='Keep N-terminal residue in decoy sequences')
+    common_decoy_parser.add_argument('--keep-cterm', action='store_true', help='Keep C-terminal residue in decoy sequences')
+    common_decoy_parser.add_argument('-p', '--prefix', default='DECOY_', help='Decoy prefix')
+
+    fasta_decoy = fasta_commands.add_parser('decoy', parents=[parents['common'], parents['io'], common_decoy_parser],
         description='Read a FASTA file from standard input, write a FASTA with decoys to standard output.')
     fasta_decoy.set_defaults(func=decoy)
-    fasta_decoy.add_argument('-m', '--mode', choices=fasta._decoy_functions.keys(), default='reverse')
-    fasta_decoy.add_argument('--keep-nterm', action='store_true', help='Keep N-terminal residue in decoy sequences')
-    fasta_decoy.add_argument('--keep-cterm', action='store_true', help='Keep C-terminal residue in decoy sequences')
-    fasta_decoy.add_argument('-p', '--prefix', default='DECOY_', help='Decoy prefix')
     fasta_decoy.add_argument('--decoy-only', action='store_true', help='Do not include original sequences in output')
+
+    fasta_combine = fasta_commands.add_parser('combine', parents=[parents['common'], parents['io'], common_decoy_parser],
+        description='Combine multiple FASTA files, optionally adding decoys.')
+    fasta_combine.set_defaults(func=combine)
+    fasta_combine.add_argument('--with-decoy', metavar='FILES', nargs='*', help='FASTA files to be added while appending decoy sequences.')
+    fasta_combine.add_argument('--decoy-only', metavar='FILES', nargs='*', help='FASTA files with sequences that need to be turned into decoys and added.')
 
     fasta_describe = fasta_commands.add_parser('describe', parents=[parents['common'], parents['io']],
         description='Read a database and produce a short description.')
